@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -46,7 +47,9 @@ func main() {
 }
 
 func run() error {
-	return nil
+	mux := makeMuxRouter()
+	portHttp := os.Getenv("PORT")
+	log.Println("HTTP server is running and listening on port:", portHttp)
 }
 
 func makeMuxRouter() http.Handler {
