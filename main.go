@@ -3,7 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
+	"sync"
+	"time"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/joho/godotenv"
 )
 
 const difficulty = 1
@@ -18,13 +22,27 @@ type Block struct {
 	Nonce      string
 }
 
-var Blockchain []Block
+var (
+	Blockchain []Block
+	mutex      = &sync.Mutex{}
+)
 
 func main() {
-	err := os.Getenv(".evn")
-	if err != "" {
+	err := godotenv.Load()
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	go func() {
+		t := time.Now()
+		genesisBlock := Block{}
+		genesisBlock = Block{0, t.String(), calculateHash(genesisBlock), "", difficulty, ""}
+		spew.Dump(genesisBlock)
+		mutex.Lock()
+		Blockchain = append(Blockchain, genesisBlock)
+		mutex.Unlock()
+	}()
+	log.Fatal(run())
 }
 
 func run() error {
