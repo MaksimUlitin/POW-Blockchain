@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +12,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"golang.org/x/text/message"
 )
 
 const difficulty = 1
@@ -24,9 +27,13 @@ type Block struct {
 	Nonce      string
 }
 
+type Message struct {
+	Data int
+}
 var (
 	Blockchain []Block
 	mutex      = &sync.Mutex{}
+	m = Message
 )
 
 func main() {
@@ -71,22 +78,58 @@ func makeMuxRouter() http.Handler {
 	return muxRouter
 }
 
-func handleGetBlockchain() {}
-
-func handleWriteBlock() {}
-
-func respondWithJSON() {}
-
-func isBlockValid() bool {
-	return true
+func handleGetBlockchain(w http.ResponseWriter, r *http.Request) {
+	bytes, err := json.MarshalIndent(Blockchain, "", " ")
+	if err != nil {
+		
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	io.WriteString(w, string(bytes))
 }
 
-func calculateHash() string {
+func handleWriteBlock(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-Type","application/json")
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&m); err != nil {
+		respondWithJSON(w,r, http.StatusBadRequest, r.Body)
+		return
+	}
+	defer r.Body.Close()
+
+	mutex.Lock()
+	newBlock := generateBlock(Blockchain[len(Blockchain)-1], m.Data)
+	mutex.Unlock()
+	if isBlockValid(newBlock, Blockchain[len(Blockchain)-1]){
+		Blockchain = append(Blockchain, newBlock)
+		spew.Dump(Blockchain)
+	}
+}
+
+func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, payload interface{}) {
+	w.Header().Set("content-Type", "application/json")
+	respons, err := json.MarshalIndent(payload, "", " ")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HTTP 500: internal server error"))
+	}
+	
+	w.WriteHeader(code)
+	w.Write(respons)
+	
+}
+
+func isBlockValid(newBlock, oldBlock Block) bool {
+	if oldBlock.Index +1
+}
+
+func calculateHash(w http.ResponseWriter, r *http.Request) string {
 	return ""
 }
 
-func generateBlock() {}
+func generateBlock(oldBlock Block, Data int) Block {}
 
-func isHashValid() bool {
+func isHashValid(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
