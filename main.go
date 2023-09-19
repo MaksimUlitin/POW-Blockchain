@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -50,11 +51,24 @@ func run() error {
 	mux := makeMuxRouter()
 	portHttp := os.Getenv("PORT")
 	log.Println("HTTP server is running and listening on port:", portHttp)
+	s := &http.Server{
+		Addr:           ":" + portHttp,
+		Handler:        mux,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	if err := s.ListenAndServe(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func makeMuxRouter() http.Handler {
-	HandlerFunc("/", handleGetBlockchain).Method("GET")
-	HandlerFunc("/", handleWriteBlock).Method("POST")
+	muxRouter := mux.NewRouter()
+	muxRouter.HandlerFunc("/", handleGetBlockchain).Method("GET")
+	muxRouter.HandlerFunc("/", handleWriteBlock).Method("POST")
+	return muxRouter
 }
 
 func handleGetBlockchain() {}
