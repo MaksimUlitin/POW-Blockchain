@@ -1,15 +1,30 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 )
 
-type Block struct{}
+const difficulty = 1
+
+type Block struct {
+	Index      int
+	Timestamp  string
+	Data       int
+	Hash       string
+	Prevhash   string
+	Difficulty int
+	Nonce      string
+}
 
 var Blockchain []Block
 
 func main() {
-
+	err := os.Getenv(".evn")
+	if err != "" {
+		log.Fatal(err)
+	}
 }
 
 func run() error {
