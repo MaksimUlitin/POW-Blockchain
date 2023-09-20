@@ -164,7 +164,7 @@ func generateBlock(oldBlock Block, Data int) Block {
 		hex := fmt.Sprintf("%x", i)
 		newBlock.Nonce = hex
 
-		if !isBlockValid(calculateHash(newBlock), newBlock.Difficulty) {
+		if !isHashValid(calculateHash(newBlock), newBlock.Difficulty) {
 			fmt.Println(calculateHash(newBlock), "do more work")
 			time.Sleep(time.Second)
 			continue
