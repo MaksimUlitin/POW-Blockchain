@@ -1,4 +1,5 @@
 # POW-Blockchain
+<<<<<<< HEAD
 
 Это простая реализация блокчейна на языке Go. Приложение включает базовый механизм доказательства выполнения работы (Proof of Work), валидацию блоков и HTTP API для взаимодействия с блокчейном.
 
@@ -109,3 +110,6 @@ go get github.com/davecgh/go-spew
     - `handleGetBlockchain`: Возвращает текущее состояние блокчейна.
     - `handleWriteBlock`: Майнит и добавляет новый блок.
 
+=======
+a year ago ETH came to POS
+>>>>>>> 1bb4bffbd546470eb4f4f951f5e9e774c3218f5f
